@@ -1,0 +1,45 @@
+---
+image: 
+  name: saikatharryc/test_app_gen
+  tag: latest
+replicas: 2
+
+config:
+  dummy_1: "from configmap"
+secret:
+  dummy_2: "from secret"
+
+
+# whether configure readinessProbe on controller pod
+enableReadinessProbe: true
+
+# How often (in seconds) to check controller readiness
+readinessProbeInterval: 60
+
+# How long to wait before timeout (in seconds) when checking controller readiness
+readinessProbeTimeout: 3
+
+# How long to wait (in seconds) before checking the readiness probe
+readinessProbeInitialDelay: 30
+
+# whether configure livenessProbe on controller pod
+enableLivenessProbe: true
+
+# How long to wait (in seconds) before checking the liveness probe
+livenessProbeInitialDelay: 30
+
+# How long to wait before timeout (in seconds) when checking controller liveness
+livenessProbeTimeout: 1
+
+
+
+resources:
+  limits:
+   cpu: 100m
+   memory: 128Mi
+  requests:
+   cpu: 100m
+   memory: 128Mi
+
+
+hostname:

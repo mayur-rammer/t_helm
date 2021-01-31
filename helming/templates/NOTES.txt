@@ -1,0 +1,12 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+
+Check your app here:
+kubectl get svc {{ .Chart.Name }} -n {{ .Release.Namespace }} -o jsonpath="{.status['loadBalancer']['ingress'][0]['hostname']}"
+
+
+To uninstall/delete this release please run:
+
+helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}

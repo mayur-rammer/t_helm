@@ -1,0 +1,61 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      # Its a public image, otherwise i would have to mention pullSecret
+      imagePullSecrets:
+      containers:
+      - name: {{ .Chart.Name }}
+        # Assuming Images afe well versioned, otherwise use Always
+        imagePullPolicy: IfNotPresent
+        image: "{{ .Values.image.name }}:{{ .Values.image.tag | default "latest" }}"
+        ports:
+          # 
+          - containerPort: 3000
+            name: http-port
+{{- if .Values.enableReadinessProbe }}
+        readinessProbe:
+          httpGet:
+            path: /manifest.json
+            port: http-port
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.readinessProbeInitialDelay }}
+          periodSeconds: {{ .Values.readinessProbeInterval }}
+          timeoutSeconds: {{ .Values.readinessProbeTimeout }}
+        {{- end }}
+        {{- if .Values.enableLivenessProbe }}
+        livenessProbe:
+          httpGet:
+            path: /manifest.json
+            port: http-port
+            scheme: HTTP
+          initialDelaySeconds: {{ add .Values.livenessProbeInitialDelay .Values.readinessProbeInitialDelay }}
+          periodSeconds: 60
+          timeoutSeconds: {{ .Values.livenessProbeTimeout }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        # No other ENV needs to mention here
+        # customise this according to need
+        env:
+        # Map all the Configmaps and secrets to ENV
+        envFrom:
+        - configMapRef:
+            name: {{ .Chart.Name }}-configmap
+        - secretRef:
+            name: {{ .Chart.Name }}-secrets

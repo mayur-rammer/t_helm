@@ -1,0 +1,8 @@
+apiVersion: v2
+name: test-app
+version: 0.0.1
+description: Test App
+home: https://github.com/contentful/the-example-app.nodejs/
+maintainers:
+  - name: saikat chakrabortty
+    email: saikatchakrabortty2@gmail.com
